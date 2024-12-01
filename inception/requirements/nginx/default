@@ -16,17 +16,30 @@
 # Please see /usr/share/doc/nginx-doc/examples/ for more detailed examples.
 ##
 
-# Default server configuration
-#
+# Redirect all HTTP traffic to HTTPS
 server {
 	listen 80 default_server;
 	listen [::]:80 default_server;
 
-	# SSL configuration
-	#
-	# listen 443 ssl default_server;
-	# listen [::]:443 ssl default_server;
-	#
+	server_name _;
+
+	# Redirect all HTTP requests to HTTPS
+	return 301 https://$host$request_uri;
+}
+
+# Default server configuration for HTTPS
+server {
+	listen 443 ssl default_server;
+	listen [::]:443 ssl default_server;
+
+	# SSL Configuration
+	ssl_certificate /etc/nginx/ssl/nginx.crt;
+	ssl_certificate_key /etc/nginx/ssl/nginx.key;
+
+	# Enforce TLSv1.2 and TLSv1.3 protocols
+	ssl_protocols TLSv1.2 TLSv1.3;
+	ssl_prefer_server_ciphers on;
+
 	# Note: You should disable gzip for SSL traffic.
 	# See: https://bugs.debian.org/773332
 	#

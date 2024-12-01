@@ -6,4 +6,8 @@ chmod +x wp-cli.phar
 ./wp-cli.phar config create --dbname=wordpress --dbuser=wpuser --dbpass=password --dbhost=mariadb --allow-root
 ./wp-cli.phar core install --url=localhost --title=inception --admin_user=admin --admin_password=admin --admin_email=admin@admin.com --allow-root
 
+# Explicitly create wp-content/uploads and set permissions
+mkdir -p wp-content/uploads
+chmod -R 0777 wp-content/uploads
+
 php-fpm8.2 -F

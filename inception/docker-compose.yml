@@ -6,14 +6,31 @@ services:
       - wordpress
       - mariadb
     ports:
-      - "80:80"
+      - "443:443"
     volumes:
       - ./web:/var/www/html
+    networks:
+      - inception_network
+    restart: always
   wordpress:
     build: requirements/wordpress/.
     container_name: wp-php
     volumes:
       - ./web:/var/www/html
+    networks:
+      - inception_network
+    restart: always
   mariadb:
     build: requirements/mariadb/.
     container_name: mariadb
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - inception_network
+    restart: always
+volumes:
+  db_data:
+
+networks:
+  inception_network:
+
