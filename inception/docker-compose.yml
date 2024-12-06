@@ -12,6 +12,8 @@ services:
     networks:
       - inception_network
     restart: always
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME} # Pass DOMAIN_NAME to the container
   wordpress:
     build: requirements/wordpress/.
     container_name: wp-php
@@ -19,6 +21,21 @@ services:
       - ./web:/var/www/html
     networks:
       - inception_network
+    secrets:
+      - db_name
+      - db_user
+      - db_password
+      - admin_user
+      - admin_password
+      - admin_email
+    environment:
+      - DB_NAME_FILE=/run/secrets/db_name
+      - DB_USER_FILE=/run/secrets/db_user
+      - DB_PASSWORD_FILE=/run/secrets/db_password
+      - ADMIN_USER_FILE=/run/secrets/admin_user
+      - ADMIN_PASSWORD_FILE=/run/secrets/admin_password
+      - ADMIN_EMAIL_FILE=/run/secrets/admin_email
+      - DOMAIN_NAME=${DOMAIN_NAME}  # Reference the variable from .env
     restart: always
   mariadb:
     build: requirements/mariadb/.
@@ -28,9 +45,44 @@ services:
     networks:
       - inception_network
     restart: always
+  ftp:
+    build: requirements/ftp/.
+    container_name: ftp
+    depends_on:
+      - wordpress
+    environment:
+      FTP_USER_NAME: "ftpuser"
+      FTP_USER_PASS: "ftppassword"
+      FTP_USER_HOME: "/var/www/html"
+      FTP_USER_UID: 1001  # Match the UID of the newly created user
+      FTP_USER_GID: 1001  # Match the GID of the newly created user
+    volumes:
+      - ./web:/var/www/html
+    ports:
+      - "21:21" # FTP control port
+      - "30000-30009:30000-30009" # Passive FTP ports
+    networks:
+      - inception_network
+    restart: always
+
+
+
 volumes:
   db_data:
 
 networks:
   inception_network:
 
+secrets:
+  db_name:
+    file: ./secrets/db_name.txt
+  db_user:
+    file: ./secrets/db_user.txt
+  db_password:
+    file: ./secrets/db_password.txt
+  admin_user:
+    file: ./secrets/admin_user.txt
+  admin_password:
+    file: ./secrets/admin_password.txt
+  admin_email:
+    file: ./secrets/admin_email.txt
