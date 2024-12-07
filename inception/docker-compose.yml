@@ -29,12 +29,6 @@ services:
       - admin_password
       - admin_email
     environment:
-      - DB_NAME_FILE=/run/secrets/db_name
-      - DB_USER_FILE=/run/secrets/db_user
-      - DB_PASSWORD_FILE=/run/secrets/db_password
-      - ADMIN_USER_FILE=/run/secrets/admin_user
-      - ADMIN_PASSWORD_FILE=/run/secrets/admin_password
-      - ADMIN_EMAIL_FILE=/run/secrets/admin_email
       - DOMAIN_NAME=${DOMAIN_NAME}  # Reference the variable from .env
     restart: always
   mariadb:
@@ -50,17 +44,17 @@ services:
     container_name: ftp
     depends_on:
       - wordpress
-    environment:
-      FTP_USER_NAME: "ftpuser"
-      FTP_USER_PASS: "ftppassword"
-      FTP_USER_HOME: "/var/www/html"
-      FTP_USER_UID: 1001  # Match the UID of the newly created user
-      FTP_USER_GID: 1001  # Match the GID of the newly created user
+    # environment:
+    #   FTP_USR: ${FTP_USR}
+    #   FTP_PWD: ${FTP_PWD}
+    secrets:
+      - ftp_user
+      - ftp_psw
     volumes:
       - ./web:/var/www/html
     ports:
       - "21:21" # FTP control port
-      - "30000-30009:30000-30009" # Passive FTP ports
+      - "21100-21110:21100-21110"
     networks:
       - inception_network
     restart: always
@@ -86,3 +80,7 @@ secrets:
     file: ./secrets/admin_password.txt
   admin_email:
     file: ./secrets/admin_email.txt
+  ftp_user:
+    file: ./secrets/ftp_user.txt
+  ftp_psw:
+    file: ./secrets/ftp_psw.txt

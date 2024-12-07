@@ -1,23 +1,22 @@
 FROM debian:stable
 
+# Install vsftpd
 RUN apt update && apt install -y vsftpd && apt clean
 
-# Add FTP configuration
+# Copy vsftpd configuration
 COPY vsftpd.conf /etc/vsftpd.conf
 
-# Ensure required directories exist
-RUN mkdir -p /var/www/html && \
-    mkdir -p /var/run/vsftpd/empty && \
-    chmod 555 /var/run/vsftpd/empty
+# Ensure secure_chroot_dir exists
+RUN mkdir -p /var/run/vsftpd/empty && chmod 555 /var/run/vsftpd/empty
 
-# Create a new FTP user with a unique UID and GID
-RUN useradd -u 1001 -d /var/www/html ftpuser && \
-    echo "ftpuser:ftppassword" | chpasswd && \
-    chown -R ftpuser:ftpuser /var/www/html
+# Set ownership and permissions for /var/www/html
+RUN mkdir -p /var/www/html && chown -R www-data:www-data /var/www/html && chmod -R 775 /var/www/html
 
-# Ensure proper permissions for the FTP directory
-RUN chmod -R 775 /var/www/html
+# Use entrypoint to handle secrets at runtime
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-EXPOSE 21 30000-30009
+EXPOSE 21 40000-40010
 
-CMD ["vsftpd", "/etc/vsftpd.conf"]
+# Launch vsftpd
+ENTRYPOINT ["/entrypoint.sh"]

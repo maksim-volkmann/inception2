@@ -4,14 +4,15 @@ curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.pha
 chmod +x wp-cli.phar
 
 # Read secrets from files
-DB_NAME=$(cat $DB_NAME_FILE)
-DB_USER=$(cat $DB_USER_FILE)
-DB_PASS=$(cat $DB_PASSWORD_FILE)
-ADMIN_USER=$(cat $ADMIN_USER_FILE)
-ADMIN_PASS=$(cat $ADMIN_PASSWORD_FILE)
+DB_NAME=$(cat /run/secrets/db_name)
+DB_USER=$(cat /run/secrets/db_user)
+DB_PASSWORD=$(cat /run/secrets/db_password)
+ADMIN_USER=$(cat /run/secrets/admin_user)
+ADMIN_PASS=$(cat /run/secrets/admin_password)
+ADMIN_EMAIL=$(cat /run/secrets/admin_email)
 
 # DOMAIN_NAME is set in the environment or provide a default
-DOMAIN_NAME=${DOMAIN_NAME:-localhost}
+DOMAIN_NAME=${DOMAIN_NAME}
 
 ./wp-cli.phar core download --allow-root
 ./wp-cli.phar config create --dbname=$DB_NAME --dbuser=$DB_USER --dbpass=$DB_PASS --dbhost=mariadb --allow-root
