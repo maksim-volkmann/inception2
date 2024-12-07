@@ -19,3 +19,10 @@ https://github.com/vbachele/Inception/tree/main
 ## Portainer
 https://www.youtube.com/watch?v=QBNaOdNSsx8
 
+
+Your volumes will be available in the /home/login/data folder of the
+host machine using Docker. Of course, you have to replace the login
+with yours.
+
+
+remove from git the web aka wordpress
